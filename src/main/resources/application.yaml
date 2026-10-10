@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: Azure
+
+
+  # ── Database ───────────────────────────────────────────────────
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/Azure_Presigned}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:00000}
+    driver-class-name: org.postgresql.Driver
+
+  # ── JPA / Hibernate ────────────────────────────────────────────
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+# ── Server ───────────────────────────────────────────────────────
+server:
+  port: 8081
