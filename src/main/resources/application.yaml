@@ -2,15 +2,14 @@ spring:
   application:
     name: Azure
 
-
-  # ── Database ───────────────────────────────────────────────────
+  # Database
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/Azure_Presigned}
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:00000}
     driver-class-name: org.postgresql.Driver
 
-  # ── JPA / Hibernate ────────────────────────────────────────────
+  # JPA / Hibernate
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -20,6 +19,18 @@ spring:
       hibernate:
         format_sql: true
 
-# ── Server ───────────────────────────────────────────────────────
+  # AWS
+  cloud:
+    aws:
+      region:
+        static: ap-southeast-2
+
+# Server
 server:
   port: 8081
+
+# Application-specific S3 configuration
+app:
+  aws:
+    s3:
+      bucket: my-presigned-upload-bucket-2026
