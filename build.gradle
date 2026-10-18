@@ -13,14 +13,28 @@ java {
 	}
 }
 
+ext {
+	set('springCloudAwsVersion', "4.2.0")
+}
+
 repositories {
 	mavenCentral()
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${springCloudAwsVersion}"
+	}
 }
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+	// Auto-configures AWS SDK v2 S3Client and S3Presigner
+	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
+	// Auto-configures @SqsListener for our event queue
+	implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'org.postgresql:postgresql'
