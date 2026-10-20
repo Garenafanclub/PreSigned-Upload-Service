@@ -10,7 +10,7 @@ import org.mapstruct.Mapping;
 public interface UserMapper {
 
     // CONVERT DTO TO ENTITY
-    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "userId", ignore = true)
     User toEntity(CreateUserRequest createUserRequest);
 
     // CONVERT ENTITY TO DTO
