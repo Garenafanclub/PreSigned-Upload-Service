@@ -1,13 +1,10 @@
 package com.PresignedUrl.Azure.Controller;
 
 import com.PresignedUrl.Azure.DTOs.CreateUserRequest;
-import com.PresignedUrl.Azure.DTOs.CreateUserResponse;
+import com.PresignedUrl.Azure.DTOs.UserResponse;
 import com.PresignedUrl.Azure.Service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,13 +19,12 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<CreateUserResponse> createUser(CreateUserRequest createUserRequest){
+    public ResponseEntity<UserResponse> createUser(@RequestBody  CreateUserRequest createUserRequest){
         return ResponseEntity.ok(userService.createUser(createUserRequest));
     }
 
-
     @GetMapping
-    public ResponseEntity<List<CreateUserResponse>> getUser()
+    public ResponseEntity<List<UserResponse>> getUser()
     {
         return ResponseEntity.ok(userService.getAllUsers());
     }
