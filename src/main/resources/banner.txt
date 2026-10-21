@@ -6,5 +6,5 @@ ${AnsiColor.BRIGHT_GREEN}
  |_|  |_| \__,_| \__, | \__,_| _| |_ |_|\_\   |____/  \__,_| _| |_ |___/ \__,_ |_|
                  ___/
 
-${AnsiColor.BRIGHT_GREEN} :: Employee Management API ::  (v1.0.0)
+${AnsiColor.BRIGHT_GREEN} :: Presigned URL API ::  (v1.0.0)
 ${AnsiColor.DEFAULT}

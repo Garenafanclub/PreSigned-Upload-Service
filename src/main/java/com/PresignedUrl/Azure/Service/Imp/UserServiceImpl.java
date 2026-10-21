@@ -1,7 +1,7 @@
 package com.PresignedUrl.Azure.Service.Imp;
 
 import com.PresignedUrl.Azure.DTOs.CreateUserRequest;
-import com.PresignedUrl.Azure.DTOs.CreateUserResponse;
+import com.PresignedUrl.Azure.DTOs.UserResponse;
 import com.PresignedUrl.Azure.Mapper.UserMapper;
 import com.PresignedUrl.Azure.Model.User;
 import com.PresignedUrl.Azure.Repository.UserRepo;
@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public CreateUserResponse createUser(CreateUserRequest createUserRequest) {
+    public UserResponse createUser(CreateUserRequest createUserRequest) {
         log.info("Creating user with email: {}", createUserRequest.email());
 
         if(userRepo.findByEmail(createUserRequest.email()) != null){
@@ -41,13 +41,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<CreateUserResponse> getAllUsers() {
+    public List<UserResponse> getAllUsers() {
         // GET THE ALL USERS FROM THE DATABASE...
         List<User> users = userRepo.findAll();
-        List<CreateUserResponse> userResponses = new ArrayList<>();
+        List<UserResponse> userResponses = new ArrayList<>();
         for(User user : users)
         {
-            CreateUserResponse response = userMapper.toResponseDTO(user);
+            UserResponse response = userMapper.toResponseDTO(user);
             userResponses.add(response);
         }
         return userResponses;
