@@ -3,7 +3,10 @@ package com.PresignedUrl.Azure.Model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -34,16 +37,12 @@ public class FileMetaData {
     @Column(nullable = false)
     private UploadStatus uploadStatus = UploadStatus.PENDING;
 
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @CreationTimestamp
+    private Instant createdAt;
 
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt = LocalDateTime.now();
-
-    @PreUpdate
-    public void preUpdate()
-    {
-        this.updatedAt = LocalDateTime.now();
-    }
+    @UpdateTimestamp
+    private Instant updatedAt;
 
 }

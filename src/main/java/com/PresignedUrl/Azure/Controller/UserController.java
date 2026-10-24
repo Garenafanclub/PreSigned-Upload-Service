@@ -3,6 +3,7 @@ package com.PresignedUrl.Azure.Controller;
 import com.PresignedUrl.Azure.DTOs.CreateUserRequest;
 import com.PresignedUrl.Azure.DTOs.UserResponse;
 import com.PresignedUrl.Azure.Service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +20,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserResponse> createUser(@RequestBody  CreateUserRequest createUserRequest){
+    public ResponseEntity<UserResponse> createUser(@RequestBody @Valid CreateUserRequest createUserRequest){
         return ResponseEntity.ok(userService.createUser(createUserRequest));
     }
 

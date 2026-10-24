@@ -34,10 +34,10 @@ public class UserServiceImpl implements UserService {
         }
 
         User newUser = userMapper.toEntity(createUserRequest);
-        userRepo.save(newUser);
+        User savedUser = userRepo.save(newUser);
         log.info("User with email {} created successfully", createUserRequest.email());
 
-        return userMapper.toResponseDTO(newUser);
+        return userMapper.toResponseDTO(savedUser);
     }
 
     @Override
