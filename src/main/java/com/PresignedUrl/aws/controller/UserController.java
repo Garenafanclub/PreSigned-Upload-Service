@@ -1,0 +1,32 @@
+package com.PresignedUrl.aws.controller;
+
+import com.PresignedUrl.aws.dto.request.CreateUserRequest;
+import com.PresignedUrl.aws.dto.response.UserResponse;
+import com.PresignedUrl.aws.service.UserService;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("api/v1/users")
+public class UserController {
+
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @PostMapping
+    public ResponseEntity<UserResponse> createUser(@RequestBody @Valid CreateUserRequest createUserRequest){
+        return ResponseEntity.ok(userService.createUser(createUserRequest));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserResponse>> getUser()
+    {
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
+}
