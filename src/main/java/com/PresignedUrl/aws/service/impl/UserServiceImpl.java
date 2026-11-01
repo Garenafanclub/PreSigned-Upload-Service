@@ -59,4 +59,17 @@ public class UserServiceImpl implements UserService {
         }
         return userResponses;
     }
+
+    @Override
+    public void deleteUser(String email) {
+        log.info("Attempting to delete user with email: {}", email);
+        User user = userRepo.findByEmail(email);
+        if (user == null) {
+            log.error("User with email {} not found", email);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "User with email " + email + " not found");
+        }
+        userRepo.delete(user);
+        log.info("User with email {} deleted successfully", email);
+    }
 }

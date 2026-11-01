@@ -29,4 +29,11 @@ public class UserController {
     {
         return ResponseEntity.ok(userService.getAllUsers());
     }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteUser(@RequestParam String email)
+    {
+        userService.deleteUser(email);
+        return ResponseEntity.noContent().build();
+    }
 }

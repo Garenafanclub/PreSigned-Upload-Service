@@ -9,4 +9,6 @@ public interface UserService {
     UserResponse createUser(CreateUserRequest createUserRequest);
 
     List<UserResponse> getAllUsers();
+
+    void deleteUser(String email);
 }
