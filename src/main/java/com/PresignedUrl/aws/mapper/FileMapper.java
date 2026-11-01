@@ -2,7 +2,7 @@ package com.PresignedUrl.aws.mapper;
 
 import com.PresignedUrl.aws.dto.request.PresignedUrlRequest;
 import com.PresignedUrl.aws.dto.response.PresignedUrlResponse;
-import com.PresignedUrl.aws.model.FileMetaData;
+import com.PresignedUrl.aws.model.FileMetadata;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -19,10 +19,10 @@ public interface FileMapper {
     @Mapping(target = "uploadStatus", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    FileMetaData toEntity(PresignedUrlRequest presignedUrlRequest);
+    FileMetadata toEntity(PresignedUrlRequest presignedUrlRequest);
 
     // presignedUrl is ignored because it's not in the DB, it comes from AWS
     @Mapping(target = "presignedUrl", ignore = true)
-    PresignedUrlResponse toResponse(FileMetaData fileMetaData);
+    PresignedUrlResponse toResponse(FileMetadata fileMetaData);
 
 }
