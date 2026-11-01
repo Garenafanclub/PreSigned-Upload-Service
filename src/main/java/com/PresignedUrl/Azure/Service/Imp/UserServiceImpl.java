@@ -7,7 +7,10 @@ import com.PresignedUrl.Azure.Model.User;
 import com.PresignedUrl.Azure.Repository.UserRepo;
 import com.PresignedUrl.Azure.Service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,12 +28,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserResponse createUser(CreateUserRequest createUserRequest) {
         log.info("Creating user with email: {}", createUserRequest.email());
 
-        if(userRepo.findByEmail(createUserRequest.email()) != null){
+        if (userRepo.findByEmail(createUserRequest.email()) != null) {
             log.error("User with email {} already exists", createUserRequest.email());
-            throw new RuntimeException("User with email " + createUserRequest.email() + " already exists");
+            // Throw a 409 Conflict instead of a generic 500 server error
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "User with email " + createUserRequest.email() + " already exists");
         }
 
         User newUser = userMapper.toEntity(createUserRequest);
@@ -41,6 +47,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserResponse> getAllUsers() {
         // GET THE ALL USERS FROM THE DATABASE...
         List<User> users = userRepo.findAll();
