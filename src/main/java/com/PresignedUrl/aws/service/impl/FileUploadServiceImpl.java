@@ -3,7 +3,7 @@ package com.PresignedUrl.aws.service.impl;
 import com.PresignedUrl.aws.dto.request.PresignedUrlRequest;
 import com.PresignedUrl.aws.dto.response.PresignedUrlResponse;
 import com.PresignedUrl.aws.mapper.FileMapper;
-import com.PresignedUrl.aws.model.FileMetaData;
+import com.PresignedUrl.aws.model.FileMetadata;
 import com.PresignedUrl.aws.model.User;
 import com.PresignedUrl.aws.repository.FileMetadataRepo;
 import com.PresignedUrl.aws.repository.UserRepo;
@@ -48,11 +48,11 @@ public class FileUploadServiceImpl implements FileUploadService {
         String generates3Key = "uploads/users/" + user.getUserId() + "/" + UUID.randomUUID() + "_" + presignedUrlRequest.fileName();
 
         // Map and save file metadata to the database (omitted for brevity)
-        FileMetaData fileMetaData = fileMapper.toEntity(presignedUrlRequest);
+        FileMetadata fileMetaData = fileMapper.toEntity(presignedUrlRequest);
         fileMetaData.setUser(user);
         fileMetaData.setS3Key(generates3Key);
 
-        FileMetaData savedEntity = fileMetadataRepo.save(fileMetaData);
+        FileMetadata savedEntity = fileMetadataRepo.save(fileMetaData);
         log.info("Database record created with ID: {}", fileMetaData.getFileId());
 
         // Request the URL from our S3 service

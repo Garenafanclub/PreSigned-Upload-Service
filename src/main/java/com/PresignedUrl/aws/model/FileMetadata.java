@@ -13,7 +13,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @Table(name = "file_metadata")
-public class FileMetaData {
+public class FileMetadata {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
