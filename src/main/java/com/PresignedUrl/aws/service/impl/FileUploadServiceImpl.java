@@ -4,6 +4,7 @@ import com.PresignedUrl.aws.dto.request.PresignedUrlRequest;
 import com.PresignedUrl.aws.dto.response.PresignedUrlResponse;
 import com.PresignedUrl.aws.mapper.FileMapper;
 import com.PresignedUrl.aws.model.FileMetadata;
+import com.PresignedUrl.aws.model.UploadStatus;
 import com.PresignedUrl.aws.model.User;
 import com.PresignedUrl.aws.repository.FileMetadataRepo;
 import com.PresignedUrl.aws.repository.UserRepo;
@@ -11,6 +12,7 @@ import com.PresignedUrl.aws.service.FileUploadService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
@@ -61,5 +63,29 @@ public class FileUploadServiceImpl implements FileUploadService {
                                   presignedUrlRequest.contentType());
 
         return new PresignedUrlResponse(generates3Key, awsURL, savedEntity.getFileId());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String generateUrlForDownload(String fileId, Long userId) {
+        log.info("Generating presigned download URL for file ID: {}", fileId);
+
+        FileMetadata fileMetadata = fileMetadataRepo.findById(UUID.fromString(fileId))
+                .orElseThrow(() -> {
+                    log.error("File with ID {} not found", fileId);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found");
+                });
+
+        if(fileMetadata.getUploadStatus() != null && fileMetadata.getUploadStatus().equals(UploadStatus.COMPLETED)) {
+            if(!fileMetadata.getUser().getUserId().equals(userId)){
+                log.warn("Security violation: User {} attempted to access file {} owned by user {}",
+                        userId, fileId, fileMetadata.getUser().getUserId());
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to access this file");
+            }
+
+            return awsS3Service.generatePresignedGetURL(fileMetadata.getS3Key());
+        }
+
+        return new ResponseStatusException(HttpStatus.BAD_REQUEST, "File upload is not completed yet").getMessage();
     }
 }
