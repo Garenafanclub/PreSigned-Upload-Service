@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse createUser(CreateUserRequest createUserRequest) {
         log.info("Creating user with email: {}", createUserRequest.email());
 
-        if (userRepo.findByEmail(createUserRequest.email()) != null) {
+        if (userRepo.findByEmail(createUserRequest.email()).isPresent()) {
             log.error("User with email {} already exists", createUserRequest.email());
             // Throw a 409 Conflict instead of a generic 500 server error
             throw new ResponseStatusException(HttpStatus.CONFLICT,
@@ -61,14 +61,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteUser(String email) {
         log.info("Attempting to delete user with email: {}", email);
-        User user = userRepo.findByEmail(email);
-        if (user == null) {
-            log.error("User with email {} not found", email);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "User with email " + email + " not found");
-        }
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> {
+                    log.error("User not found");
+                    return new ResponseStatusException(
+                            HttpStatus.NOT_FOUND,
+                            "User with email " + email + " not found"
+                    );
+                });
+
         userRepo.delete(user);
         log.info("User with email {} deleted successfully", email);
     }

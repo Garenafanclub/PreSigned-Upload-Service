@@ -8,4 +8,6 @@ import java.util.UUID;
 
 @Repository
 public interface FileMetadataRepo extends JpaRepository<FileMetadata, UUID> {
+
+    FileMetadata findByS3Key(String s3Key);
 }
