@@ -29,7 +29,7 @@ public class FileController {
 
     @GetMapping("/{fileId}/download-url")
     public ResponseEntity<Map<String, String>> generatePresignedUrlForDownload(
-            @PathVariable String fileId, @RequestParam Long userId){
+            @PathVariable UUID fileId, @RequestParam Long userId){
         String downloadUrl = fileUploadService.generateUrlForDownload(fileId, userId);
         return ResponseEntity.ok(Map.of("url", downloadUrl));
     }

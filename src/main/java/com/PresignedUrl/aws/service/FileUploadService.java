@@ -8,5 +8,5 @@ import java.util.UUID;
 public interface FileUploadService {
     PresignedUrlResponse generatePresignedUrl(PresignedUrlRequest presignedUrlRequest);
 
-    String generateUrlForDownload(String fileId, Long userId);
+    String generateUrlForDownload(UUID fileId, Long userId);
 }

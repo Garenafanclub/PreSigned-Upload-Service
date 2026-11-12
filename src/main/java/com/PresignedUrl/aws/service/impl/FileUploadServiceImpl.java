@@ -56,7 +56,7 @@ public class FileUploadServiceImpl implements FileUploadService {
         fileMetaData.setS3Key(generates3Key);
 
         FileMetadata savedEntity = fileMetadataRepo.save(fileMetaData);
-        log.info("Database record created with ID: {}", fileMetaData.getFileId());
+        log.info("Database record created with ID: {}", savedEntity.getFileId());
 
         // Request the URL from our S3 service
         String awsURL = awsS3Service.generatePresignedPutURL(
@@ -68,13 +68,13 @@ public class FileUploadServiceImpl implements FileUploadService {
 
     @Override
     @Transactional(readOnly = true)
-    public String generateUrlForDownload(String fileId, Long userId) {
+    public String generateUrlForDownload(UUID fileId, Long userId) {
         log.info("Generating presigned download URL for file ID: {}", fileId);
 
-        FileMetadata fileMetadata = fileMetadataRepo.findById(UUID.fromString(fileId))
+        FileMetadata fileMetadata = fileMetadataRepo.findById(fileId)
                 .orElseThrow(() -> {
                     log.error("File with ID {} not found", fileId);
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found");
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found");
                 });
 
         if(fileMetadata.getUploadStatus() != null && fileMetadata.getUploadStatus().equals(UploadStatus.COMPLETED)) {
