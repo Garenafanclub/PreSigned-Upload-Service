@@ -8,16 +8,20 @@ spring:
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:00000}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 15 # 15 connections reserved for SQS + 10 for REST API traffic
 
   # JPA / Hibernate
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: true
     properties:
       hibernate:
         format_sql: true
+
+
+
 
   # AWS
   cloud:
