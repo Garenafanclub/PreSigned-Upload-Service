@@ -9,7 +9,7 @@ spring:
     password: ${DB_PASSWORD:00000}
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 15 # 15 connections reserved for SQS + 10 for REST API traffic
+      maximum-pool-size: 15 # 10 connections reserved for SQS + 5 for REST API traffic
 
   # JPA / Hibernate
   jpa:
@@ -19,9 +19,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
-
-
-
 
   # AWS
   cloud:

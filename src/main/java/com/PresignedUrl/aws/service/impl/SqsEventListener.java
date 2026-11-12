@@ -4,7 +4,6 @@ import com.PresignedUrl.aws.dto.s3Event.S3EventNotification;
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
 @Component

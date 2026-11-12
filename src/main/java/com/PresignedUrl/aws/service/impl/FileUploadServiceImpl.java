@@ -35,6 +35,7 @@ public class FileUploadServiceImpl implements FileUploadService {
     }
 
     @Override
+    @Transactional
     public PresignedUrlResponse generatePresignedUrl(PresignedUrlRequest presignedUrlRequest) {
 
         log.info("Initiating presigned URL generation for user ID: {}, file: {}", presignedUrlRequest.userId(), presignedUrlRequest.fileName());
@@ -73,7 +74,7 @@ public class FileUploadServiceImpl implements FileUploadService {
         FileMetadata fileMetadata = fileMetadataRepo.findById(UUID.fromString(fileId))
                 .orElseThrow(() -> {
                     log.error("File with ID {} not found", fileId);
-                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found");
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found");
                 });
 
         if(fileMetadata.getUploadStatus() != null && fileMetadata.getUploadStatus().equals(UploadStatus.COMPLETED)) {
@@ -86,6 +87,6 @@ public class FileUploadServiceImpl implements FileUploadService {
             return awsS3Service.generatePresignedGetURL(fileMetadata.getS3Key());
         }
 
-        return new ResponseStatusException(HttpStatus.BAD_REQUEST, "File upload is not completed yet").getMessage();
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File upload is not completed yet");
     }
 }
