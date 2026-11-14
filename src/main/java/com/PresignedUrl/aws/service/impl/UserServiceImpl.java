@@ -63,6 +63,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void deleteUser(String email) {
+        // STILL IN DEVELOPMENT TO CHECK IF THE USER HAS FILES ASSOCIATED WITH THEM BEFORE DELETION...
         log.info("Attempting to delete user with email: {}", email);
         User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> {
