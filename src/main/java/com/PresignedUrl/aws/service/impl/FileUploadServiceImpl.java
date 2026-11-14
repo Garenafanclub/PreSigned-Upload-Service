@@ -91,6 +91,7 @@ public class FileUploadServiceImpl implements FileUploadService {
     }
 
     @Override
+    @Transactional
     public void markUploadAsComplete(String s3Key) {
 
             FileMetadata fileMetadata = fileMetadataRepo.findByS3Key(s3Key)

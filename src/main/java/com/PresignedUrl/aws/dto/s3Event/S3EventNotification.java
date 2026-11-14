@@ -8,5 +8,8 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record S3EventNotification(
      @JsonProperty("Records")
-     List<S3EventRecord> records
+     List<S3EventRecord> records,
+
+     @JsonProperty("Event")
+     String event
 ){}

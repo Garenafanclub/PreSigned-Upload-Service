@@ -2,35 +2,48 @@ package com.PresignedUrl.aws.service.impl;
 
 import com.PresignedUrl.aws.dto.s3Event.S3EventNotification;
 import com.PresignedUrl.aws.dto.s3Event.S3EventRecord;
+import com.PresignedUrl.aws.service.FileUploadService;
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Component
 public class SqsEventListener {
 
+    private final FileUploadService fileUploadService;
+
+    public SqsEventListener(FileUploadService fileUploadService) {
+        this.fileUploadService = fileUploadService;
+    }
+
     @SqsListener("s3-uploads-events-queue")
-    public void consumeMessage(S3EventNotification eventNotification)
-    {
+    public void consumeMessage(S3EventNotification eventNotification) {
+
         log.info("Received message from SQS: {}", eventNotification);
-        // Process the message as needed
+
         // parse a JSON message and extract the S3 key
-        // You can use a JSON library like Jackson or Gson to parse the message ( or use the S3EventNotification class to deserialize it directly)
-        try {
-            if (eventNotification == null || eventNotification.records() == null || eventNotification.records().isEmpty()) {
-                log.warn("Received empty or null S3EventNotification: {}", eventNotification);
-                return; // Don't throw exception, just log and return and let the SQS DELETE this useless message...
-            }
-            // Idempotent processing honi chahiye...
-            // if record/event is wrong , then don't process it further and directly send into dlq...
-        }catch (DataAccessException e){
-            log.error("Database connection failure while processing SQS message: {}", e.getMessage());
-            throw e; // Rethrow to let SQS know to retry the message later
-        }catch (Exception e) {
-            log.error("Unexpected error while processing SQS message: {}", e.getMessage());
-            throw new RuntimeException("Unexpected SQS failure", e); // Rethrow to let SQS know to retry the message later.
+        // You can use a JSON library like Jackson to parse the message ( or use the S3EventNotification class to deserialize it directly)
+
+        if (eventNotification == null) {
+            log.warn("Received null S3 event notification. Ignoring.");
+            return;
+        }
+
+        // Handle S3 configuration test event.
+        if ("s3:TestEvent".equals(eventNotification.event())) {
+            log.info("Received S3 test event. Ignoring.");
+            return;
+        }
+
+        if (eventNotification.records() == null ||
+                eventNotification.records().isEmpty()) {
+            log.warn("Received S3 event without records. Ignoring.");
+            return;
         }
 
         for(S3EventRecord record : eventNotification.records()) {
@@ -42,10 +55,35 @@ public class SqsEventListener {
                     record.s3().bucket() == null ||
                     record.s3().bucket().name() == null) {
                 log.error("Invalid S3EventRecord received: {}", record);
-                throw new IllegalArgumentException("Invalid S3EventRecord received: ");
+                continue; // Don't throw exception, just log and return and let the SQS DELETE this useless message...
+            }
+
+            // YOU CAN CHECK FOR VALID BUCKET ALSO IF YOU WANT I am skipping...
+
+            if (!record.eventName().startsWith("ObjectCreated:")) {
+                log.debug("Ignoring event type: {}", record.eventName());
+                continue;
+            }
+
+            String s3ObjectKey = decodeS3ObjectKey(record.s3().object().key());
+            try {
+                fileUploadService.markUploadAsComplete(s3ObjectKey);
+
+            } catch (ResponseStatusException e) {
+
+                if (e.getStatusCode().value() == 404) {
+                    log.warn("File metadata not found for S3 key: {}", s3ObjectKey);
+                    continue;
+                }
+                throw e;
             }
         }
 
+    }
+
+    public String decodeS3ObjectKey(String s3ObjectKey){
+        // DECODE THE S3 OBJECT KEY IF - IT CONTAINS SPECIAL CHARACTERS LIKES SPACES, PLUS SIGNS, ETC...
+        return URLDecoder.decode(s3ObjectKey, StandardCharsets.UTF_8);
     }
 }
 
@@ -71,6 +109,25 @@ public class SqsEventListener {
           "key": "my-uploaded-file.pdf",
           "size": 1024,
           "etag": "d41d8cd98f00b204e9800998ecf8427e"
+        }
+      }
+    }
+  ]
+}
+ // REAL ONE...
+{
+  "records": [
+    {
+      "eventVersion": "2.6",
+      "eventSource": "aws:s3",
+      "awsRegion": "ap-southeast-2",
+      "eventName": "ObjectCreated:Put",
+      "s3": {
+        "bucket": {
+          "name": "my-presigned-upload"
+        },
+        "object": {
+          "key": "uploads/users/1/76283a_backup.pdf"
         }
       }
     }
