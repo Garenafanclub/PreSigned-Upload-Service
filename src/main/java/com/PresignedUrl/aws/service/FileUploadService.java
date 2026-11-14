@@ -9,4 +9,6 @@ public interface FileUploadService {
     PresignedUrlResponse generatePresignedUrl(PresignedUrlRequest presignedUrlRequest);
 
     String generateUrlForDownload(UUID fileId, Long userId);
+
+    void markUploadAsComplete(String s3Key);
 }

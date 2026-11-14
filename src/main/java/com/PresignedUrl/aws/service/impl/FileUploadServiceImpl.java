@@ -89,4 +89,23 @@ public class FileUploadServiceImpl implements FileUploadService {
 
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File upload is not completed yet");
     }
+
+    @Override
+    public void markUploadAsComplete(String s3Key) {
+
+            FileMetadata fileMetadata = fileMetadataRepo.findByS3Key(s3Key)
+                    .orElseThrow(() -> {
+                        log.error("File with S3 key {} not found", s3Key);
+                        return new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found");
+                    });
+
+            if(fileMetadata.getUploadStatus() != null && fileMetadata.getUploadStatus().equals(UploadStatus.COMPLETED)) {
+                log.info("Idempotency check: File ID {} is already marked as COMPLETED", fileMetadata.getFileId());
+                return;
+            }
+
+            fileMetadata.setUploadStatus(UploadStatus.COMPLETED);
+            fileMetadataRepo.save(fileMetadata);
+            log.info("File ID {} marked as COMPLETED", fileMetadata.getFileId());
+    }
 }
